@@ -1,0 +1,63 @@
+version: "3"
+services:
+  api:
+    image: mlflow-server:0.3
+    ports:
+     - "5001:5001"
+    volumes:
+      - "./model:/app/volume"
+    networks:
+      example-network:
+        ipv4_address: 172.16.238.10
+
+  example-prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    container_name: example-prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      example-network:
+        ipv4_address: 172.16.238.11
+  
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - example-prometheus
+    ports:
+     - "3000:3000"
+    volumes:
+    - ./monitoring/datasource.yml:/etc/grafana/provisioning/datasource.yml
+    networks:
+      example-network:
+        ipv4_address: 172.16.238.12
+
+  label_studio:
+    image: heartexlabs/label-studio:latest
+    container_name: label_studio
+    ports:
+      - 8080:8080
+    environment:
+      - LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
+      - LOCAL_FILES_DOCUMENT_ROOT=/label-studio/data/media/upload
+    volumes:
+      - ./model/saved_data/model:/label-studio/data/media/upload
+      - ./monitoring/label-studio-config:/label-studio/data
+
+
+volumes:
+  mydata:
+
+networks:
+  example-network:
+    name: example-network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+

@@ -3,6 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+model/Drift_model
+model/Emb_model
+model/mlruns
+model/saved_data
+model/tokenizer
+
+
 # C extensions
 *.so
 
