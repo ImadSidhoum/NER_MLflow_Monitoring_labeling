@@ -1,7 +1,7 @@
 version: "3"
 services:
   api:
-    image: mlflow-server:0.3
+    image: dami7/mlflow-server:0.3
     ports:
      - "5001:5001"
     volumes:
@@ -54,10 +54,8 @@ volumes:
 
 networks:
   example-network:
-    name: example-network
     driver: bridge
     ipam:
       driver: default
       config:
         - subnet: 172.16.238.0/24
-
